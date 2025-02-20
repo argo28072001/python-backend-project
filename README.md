@@ -79,16 +79,3 @@ curl -X POST http://localhost:8000/api/v1/orders/ \
 ```
 curl http://localhost:8000/api/v1/orders/
 ```
-
-### Структура проекта
-python-backend-project/
-├── src/
-│ ├── api/ # API endpoints
-│ ├── consumer/ # Kafka consumer
-│ ├── db/ # Database models
-│ └── config.py # Configuration
-├── tests/ # Test files
-├── docker/ # Docker configurations
-├── Dockerfile.api # Dockerfile for API service
-├── Dockerfile.consumer # Dockerfile for consumer
-└── docker-compose.yml # Docker compose configuration
