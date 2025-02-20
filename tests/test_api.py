@@ -5,7 +5,7 @@ client = TestClient(app)
 
 def test_create_order():
     response = client.post(
-        "/orders/",
+        "/api/v1/orders/",
         json={"customer_name": "Test Customer", "total_amount": 100.0}
     )
     assert response.status_code == 200
@@ -15,6 +15,13 @@ def test_create_order():
     assert data["status"] == "PENDING"
 
 def test_get_orders():
-    response = client.get("/orders/")
+    client.post(
+        "/api/v1/orders/",
+        json={"customer_name": "Test Customer", "total_amount": 100.0}
+    )
+    
+    response = client.get("/api/v1/orders/")
     assert response.status_code == 200
-    assert isinstance(response.json(), list)
+    orders = response.json()
+    assert isinstance(orders, list)
+    assert len(orders) > 0

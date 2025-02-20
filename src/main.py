@@ -4,9 +4,11 @@ from prometheus_client import make_asgi_app
 
 from src.db.database import engine, Base
 from src.api.routes import router
+import os
 
-# Создаем таблицы в базе данных
-Base.metadata.create_all(bind=engine)
+# Создаем таблицы только если не в режиме тестирования
+if not os.getenv('TESTING'):
+    Base.metadata.create_all(bind=engine)
 
 # Инициализируем FastAPI приложение
 app = FastAPI(title="Order Management System")
