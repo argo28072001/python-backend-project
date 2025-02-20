@@ -1,0 +1,20 @@
+groups:
+  - name: order_alerts
+    rules:
+      - alert: HighOrderRate
+        expr: rate(orders_created_total[5m]) > 10
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High order creation rate"
+          description: "Order creation rate is {{ $value }} per second"
+
+      - alert: SlowOrderProcessing
+        expr: order_processing_seconds_bucket{le="5.0"} < 0.95
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Slow order processing"
+          description: "Order processing is taking longer than expected" 
