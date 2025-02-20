@@ -5,6 +5,7 @@ from kafka import KafkaProducer
 import json
 from prometheus_client import Counter, Histogram
 import time
+import os
 
 from src.db.database import get_db
 from src.db.models import Order as OrderModel
@@ -18,10 +19,12 @@ order_counter = Counter('orders_created_total', 'Total orders created')
 order_latency = Histogram('order_processing_seconds', 'Time spent processing order')
 
 # Kafka producer
-producer = KafkaProducer(
-    bootstrap_servers=[settings.KAFKA_BOOTSTRAP_SERVERS],
-    value_serializer=lambda v: json.dumps(v).encode('utf-8')
-)
+producer = None
+if os.getenv('TESTING') != 'true':
+    producer = KafkaProducer(
+        bootstrap_servers=[settings.KAFKA_BOOTSTRAP_SERVERS],
+        value_serializer=lambda v: json.dumps(v).encode('utf-8')
+    )
 
 @router.post("/orders/", response_model=Order)
 def create_order(order: OrderCreate, db: Session = Depends(get_db)):
@@ -35,12 +38,13 @@ def create_order(order: OrderCreate, db: Session = Depends(get_db)):
         db.commit()
         db.refresh(db_order)
         
-        # Отправка события в Kafka
-        producer.send(settings.KAFKA_TOPIC, {
-            "order_id": db_order.id,
-            "customer_name": db_order.customer_name,
-            "total_amount": db_order.total_amount
-        })
+        # Отправка события в Kafka только если не в режиме тестирования
+        if producer is not None:
+            producer.send(settings.KAFKA_TOPIC, {
+                "order_id": db_order.id,
+                "customer_name": db_order.customer_name,
+                "total_amount": db_order.total_amount
+            })
         
         order_counter.inc()
         return db_order

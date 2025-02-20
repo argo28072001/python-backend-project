@@ -3,8 +3,14 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from src.db.database import Base
 from src.db.models import Order
-from src.main import app
 from fastapi.testclient import TestClient
+import os
+
+# Устанавливаем флаг тестирования
+os.environ['TESTING'] = 'true'
+
+# После установки флага импортируем приложение
+from src.main import app
 
 SQLALCHEMY_DATABASE_URL = "postgresql://admin:password@localhost:5432/test_db"
 

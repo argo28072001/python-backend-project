@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, dev ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, dev ]
 
 jobs:
   test:
@@ -38,6 +38,9 @@ jobs:
         pip install -r requirements.txt
         
     - name: Run tests
+      env:
+        TESTING: "true"
+        DATABASE_URL: "postgresql://admin:password@localhost:5432/test_db"
       run: |
         pytest --cov=src tests/
         
